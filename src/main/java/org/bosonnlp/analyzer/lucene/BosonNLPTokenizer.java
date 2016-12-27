@@ -4,10 +4,7 @@
  */
 package org.bosonnlp.analyzer.lucene;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Iterator;
-
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
@@ -16,11 +13,12 @@ import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.bosonnlp.analyzer.core.BosonNLPWordSegmenter;
 import org.json.JSONException;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Iterator;
 
 /**
  * Implementation of BosonNLP word segmenter on Lucene Tokenizer interface
- *
  */
 public final class BosonNLPTokenizer extends Tokenizer {
     // bosonnlp word segmenter
@@ -38,7 +36,7 @@ public final class BosonNLPTokenizer extends Tokenizer {
 
     /**
      * Lucene constructor
-     * 
+     *
      * @throws UnirestException
      * @throws JSONException
      * @throws IOException
@@ -63,14 +61,16 @@ public final class BosonNLPTokenizer extends Tokenizer {
         // clear all the attributes
         clearAttributes();
         if (wordToken.hasNext()) {
-            String word = wordToken.next();
-            piAttr.setPositionIncrement(extraIncrement + 1);
-            charTermAttr.append(word);
-            charTermAttr.setLength(word.length());
-            offsetAttr.setOffset(endPosition + 1, endPosition + word.length() + 1);
-            // The type can be extended later
-            typeAttr.setType("word");
-            endPosition += word.length();
+            synchronized (this.wordToken) {
+                String word = wordToken.next();
+                piAttr.setPositionIncrement(extraIncrement + 1);
+                charTermAttr.append(word);
+                charTermAttr.setLength(word.length());
+                offsetAttr.setOffset(endPosition + 1, endPosition + word.length() + 1);
+                // The type can be extended later
+                typeAttr.setType("word");
+                endPosition += word.length();
+            }
             return true;
         }
         // No more token
