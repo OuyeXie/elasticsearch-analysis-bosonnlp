@@ -60,7 +60,7 @@ public final class BosonNLPTokenizer extends Tokenizer {
     public boolean incrementToken() throws IOException {
         // clear all the attributes
         clearAttributes();
-        synchronized (this.wordToken) {
+        synchronized (this) {
             if (wordToken.hasNext()) {
                 String word = wordToken.next();
                 piAttr.setPositionIncrement(extraIncrement + 1);
@@ -80,7 +80,7 @@ public final class BosonNLPTokenizer extends Tokenizer {
     @Override
     public void reset() throws IOException {
         try {
-            synchronized (this.wordToken) {
+            synchronized (this) {
                 super.reset();
                 BosonSeg.reset(input);
                 wordToken = BosonSeg.getWordsIter();
