@@ -60,8 +60,8 @@ public final class BosonNLPTokenizer extends Tokenizer {
     public boolean incrementToken() throws IOException {
         // clear all the attributes
         clearAttributes();
-        if (wordToken.hasNext()) {
-            synchronized (this.wordToken) {
+        synchronized (this.wordToken) {
+            if (wordToken.hasNext()) {
                 String word = wordToken.next();
                 piAttr.setPositionIncrement(extraIncrement + 1);
                 charTermAttr.append(word);
@@ -70,8 +70,8 @@ public final class BosonNLPTokenizer extends Tokenizer {
                 // The type can be extended later
                 typeAttr.setType("word");
                 endPosition += word.length();
+                return true;
             }
-            return true;
         }
         // No more token
         return false;
@@ -80,11 +80,13 @@ public final class BosonNLPTokenizer extends Tokenizer {
     @Override
     public void reset() throws IOException {
         try {
-            super.reset();
-            BosonSeg.reset(input);
-            wordToken = BosonSeg.getWordsIter();
-            extraIncrement = 0;
-            endPosition = -1;
+            synchronized (this.wordToken) {
+                super.reset();
+                BosonSeg.reset(input);
+                wordToken = BosonSeg.getWordsIter();
+                extraIncrement = 0;
+                endPosition = -1;
+            }
         } catch (JSONException | UnirestException e) {
             e.printStackTrace();
         }
