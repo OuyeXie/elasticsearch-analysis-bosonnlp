@@ -61,7 +61,7 @@ public final class BosonNLPTokenizer extends Tokenizer {
         // clear all the attributes
         clearAttributes();
         synchronized (this) {
-            if (wordToken.hasNext()) {
+            if (wordToken != null && wordToken.hasNext()) {
                 String word = wordToken.next();
                 piAttr.setPositionIncrement(extraIncrement + 1);
                 charTermAttr.append(word);
